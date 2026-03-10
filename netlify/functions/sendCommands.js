@@ -13,11 +13,16 @@ exports.handler = async function(event) {
   const db = client.db("remotecontrol")
   const commands = db.collection("commands")
 
-  await commands.insertOne({
-    command: body.command,
-    createdAt: new Date(),
-    executed: false
-  })
+  await commands.updateOne(
+    { _id: "remote" },
+    {
+      $set: {
+        command: body.command,
+        updatedAt: new Date()
+      }
+    },
+    { upsert: true }
+  )
 
   await client.close()
 
