@@ -1,16 +1,31 @@
+<h2>Laptop Remote</h2>
 
 <button onclick="send('CLOSE_BROWSER')">Close Browser</button>
+<button onclick="send('CLOSE_ALL')">Close All Applications</button>
+<button onclick="send('MUTE')">Mute</button>
+<button onclick="send('LOCK')">Lock System</button>
+<button onclick="send('SLEEP')">Sleep</button>
+<button onclick="send('SHUTDOWN')">Shutdown</button>
 
 <script>
-function send(cmd){
-    fetch(
-        "/.netlify/functions/sendCommands", 
-        {
-            method:"POST",
-            body:JSON.stringify({
-                command:cmd
-            })
-        }
-    );
+
+async function send(cmd){
+
+  const passphrase = prompt("Enter passphrase")
+
+  if(!passphrase) return
+
+  fetch("/.netlify/functions/sendCommands",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      command:cmd,
+      passphrase:passphrase
+    })
+  })
+
 }
+
 </script>
