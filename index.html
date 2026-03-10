@@ -12,10 +12,9 @@
 async function send(cmd){
 
   const passphrase = prompt("Enter passphrase")
-
   if(!passphrase) return
 
-  fetch("/.netlify/functions/sendCommands",{
+  const res = await fetch("/.netlify/functions/sendCommands",{
     method:"POST",
     headers:{
       "Content-Type":"application/json"
@@ -25,6 +24,15 @@ async function send(cmd){
       passphrase:passphrase
     })
   })
+
+  if(res.status === 401){
+    alert("Incorrect passphrase")
+    return
+  }
+
+  if(res.status === 200){
+    alert("Command sent")
+  }
 
 }
 
