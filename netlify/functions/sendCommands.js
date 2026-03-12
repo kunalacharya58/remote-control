@@ -4,16 +4,33 @@ const crypto = require("crypto")
 const uri = process.env.MONGO_URI
 const PASS_HASH = process.env.PASSPHRASE_HASH
 
-exports.handler = async function(event) {
+exports.handler = async function(event){
 
   const body = JSON.parse(event.body)
 
-  const hash = crypto
-    .createHash("sha256")
-    .update(body.passphrase)
-    .digest("hex")
+  let authenticated = false
 
-  if(hash.toLowerCase() !== PASS_HASH.toLowerCase()){
+  // check passphrase
+  if(body.passphrase){
+
+    const hash = crypto
+      .createHash("sha256")
+      .update(body.passphrase)
+      .digest("hex")
+
+    if(hash === PASS_HASH){
+      authenticated = true
+    }
+  }
+
+  // check token
+  if(body.token){
+    if(body.token === PASS_HASH){
+      authenticated = true
+    }
+  }
+
+  if(!authenticated){
     return {
       statusCode: 401,
       body: "Invalid passphrase"
@@ -29,18 +46,18 @@ exports.handler = async function(event) {
   await commands.updateOne(
     { _id: "remote" },
     {
-      $set: {
+      $set:{
         command: body.command,
         updatedAt: new Date()
       }
     },
-    { upsert: true }
+    { upsert:true }
   )
 
   await client.close()
 
   return {
     statusCode: 200,
-    body: JSON.stringify({status:"ok"})
+    body: JSON.stringify({ token: PASS_HASH })
   }
 }

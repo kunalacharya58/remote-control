@@ -57,13 +57,44 @@ Shutdown
 
 </div>
 
+
 <script>
+
+const COOKIE_NAME = "jarvis_token"
+const COOKIE_DURATION = 5 * 60 * 1000
+
+function setCookie(value){
+
+    const expires = new Date(Date.now() + COOKIE_DURATION).toUTCString()
+
+    document.cookie = `${COOKIE_NAME}=${value}; expires=${expires}; path=/`
+}
+
+function getCookie(){
+
+    const cookies = document.cookie.split("; ")
+
+    for(const c of cookies){
+
+        const [name,value] = c.split("=")
+
+        if(name === COOKIE_NAME) return value
+    }
+
+    return null
+}
 
 async function send(cmd){
 
-  const passphrase = prompt("Enter passphrase")
+  let token = getCookie()
+  let passphrase = null
 
-  if(!passphrase) return
+  if(!token){
+
+      passphrase = prompt("Enter passphrase")
+
+      if(!passphrase) return
+  }
 
   const res = await fetch("/.netlify/functions/sendCommands",{
     method:"POST",
@@ -72,17 +103,31 @@ async function send(cmd){
     },
     body:JSON.stringify({
       command:cmd,
-      passphrase:passphrase
+      passphrase:passphrase,
+      token:token
     })
   })
 
   if(res.status === 401){
-    alert("Incorrect passphrase")
+
+      alert("Incorrect passphrase")
+
+      return
   }
+
+  const data = await res.json()
+
+  if(data.token){
+      setCookie(data.token)
+  }
+
+  alert("Command sent")
 
 }
 
 </script>
+
+
 
 <style>
 
