@@ -17,9 +17,17 @@ body{
 }
 </style>
 
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#111827">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
 </head>
 
-<body class="bg-gray-900 text-gray-100 flex items-center justify-center h-screen">
+<body class="bg-gray-900 text-gray-100 flex flex-col min-h-screen">
+
+<div class="flex-1 flex items-center justify-center">
 
 <div class="w-full max-w-sm px-4">
 
@@ -33,9 +41,13 @@ WHAT DO YOU WANT..?
 
 <button onclick="send('CLOSE_ALL')" class="btn bg-red-700">Close All</button>
 
+
+
 <button onclick="send('MUTE')" class="btn bg-blue-400 text-black">Toggle Mute</button>
 
-<button onclick="send('LOCK')" class="btn bg-blue-800">Lock</button>
+<button onclick="send('SCREENSHOT')" class="btn bg-blue-800">Screenshot</button>
+
+
 
 <!-- <button onclick="send('PAUSE_MEDIA')" class="btn bg-purple-500">Pause Media</button> -->
 
@@ -43,20 +55,33 @@ WHAT DO YOU WANT..?
 
 <button onclick="send('VOLUME_FULL')" class="btn bg-green-700">Volume Full</button>
 
+
+
 <button onclick="send('BRIGHTNESS_HALF')" class="btn bg-yellow-600">Bright 50%</button>
 
 <button onclick="send('BRIGHTNESS_FULL')" class="btn bg-yellow-400 text-black">Bright Full</button>
 
+
+
+<button onclick="send('LOCK')" class="btn bg-pink-600">Lock</button>
+
+<button onclick="send('REBOOT')" class="btn bg-orange-600">Reboot</button>
+
+
+
+
 <button onclick="send('SLEEP')" class="btn bg-gray-800 border border-gray-500">Sleep</button>
 
-<button onclick="send('SHUTDOWN')" class="btn bg-black border border-red-500 text-red-400">
-Shutdown
-</button>
+<button onclick="send('SHUTDOWN')" class="btn bg-black border border-red-500 text-red-400">Shutdown</button>
 
+  </div>
 </div>
 
 </div>
 
+<footer class="text-center text-xs text-gray-500 pb-3">
+  developed by @jarvis7698
+</footer>
 
 <script>
 
@@ -64,9 +89,7 @@ const COOKIE_NAME = "jarvis_token"
 const COOKIE_DURATION = 5 * 60 * 1000
 
 function setCookie(value){
-
     const expires = new Date(Date.now() + COOKIE_DURATION).toUTCString()
-
     document.cookie = `${COOKIE_NAME}=${value}; expires=${expires}; path=/`
 }
 
@@ -75,9 +98,7 @@ function getCookie(){
     const cookies = document.cookie.split("; ")
 
     for(const c of cookies){
-
         const [name,value] = c.split("=")
-
         if(name === COOKIE_NAME) return value
     }
 
@@ -90,9 +111,7 @@ async function send(cmd){
   let passphrase = null
 
   if(!token){
-
       passphrase = prompt("Enter passphrase")
-
       if(!passphrase) return
   }
 
@@ -109,9 +128,7 @@ async function send(cmd){
   })
 
   if(res.status === 401){
-
       alert("Incorrect passphrase")
-
       return
   }
 
@@ -120,7 +137,6 @@ async function send(cmd){
   if(data.token){
       setCookie(data.token)
   }
-
   alert("Command sent")
 
 }
