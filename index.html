@@ -7,10 +7,8 @@
 
 <title>JARVIS Remote</title>
 
-<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- JetBrains Mono Font -->
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -21,35 +19,39 @@ body{
 
 </head>
 
-<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center h-screen">
 
-<div class="w-full max-w-md p-4">
+<div class="w-full max-w-sm px-4">
 
-<h1 class="text-center text-4xl font-semibold mb-6 text-green-400">
+<h1 class="text-center text-2xl font-semibold mb-6 text-green-400">
 WHAT DO YOU WANT..?
 </h1>
 
-<div class="grid grid-cols-2 gap-4">
+<div class="grid grid-cols-2 gap-3">
 
-<button onclick="send('CLOSE_BROWSER')" class="btn bg-red-500">Close Browser</button>
+<button onclick="send('CLOSE_BROWSER')" class="btn bg-red-500">Close Chrome</button>
 
 <button onclick="send('CLOSE_ALL')" class="btn bg-red-700">Close All</button>
 
-<button onclick="send('MUTE')" class="btn bg-yellow-500 text-black">Mute</button>
+<button onclick="send('MUTE')" class="btn bg-blue-400 text-black">Toggle Mute</button>
 
-<button onclick="send('PAUSE_MEDIA')" class="btn bg-purple-500">Pause Media</button>
+<button onclick="send('LOCK')" class="btn bg-blue-800">Lock</button>
 
-<button onclick="send('VOLUME_HALF')" class="btn bg-blue-500">Volume 50%</button>
+<!-- <button onclick="send('PAUSE_MEDIA')" class="btn bg-purple-500">Pause Media</button> -->
 
-<button onclick="send('VOLUME_FULL')" class="btn bg-blue-700">Volume Full</button>
+<button onclick="send('VOLUME_HALF')" class="btn bg-green-500 text-black">Volume 50%</button>
 
-<button onclick="send('BRIGHTNESS_HALF')" class="btn bg-indigo-500">Lower Brightness</button>
+<button onclick="send('VOLUME_FULL')" class="btn bg-green-700">Volume Full</button>
 
-<button onclick="send('LOCK')" class="btn bg-gray-600">Lock</button>
+<button onclick="send('BRIGHTNESS_HALF')" class="btn bg-yellow-600">Bright 50%</button>
 
-<button onclick="send('SLEEP')" class="btn bg-gray-700">Sleep</button>
+<button onclick="send('BRIGHTNESS_FULL')" class="btn bg-yellow-400 text-black">Bright Full</button>
 
-<button onclick="send('SHUTDOWN')" class="btn bg-black border border-red-500 text-red-400">Shutdown</button>
+<button onclick="send('SLEEP')" class="btn bg-gray-800 border border-gray-500">Sleep</button>
+
+<button onclick="send('SHUTDOWN')" class="btn bg-black border border-red-500 text-red-400">
+Shutdown
+</button>
 
 </div>
 
@@ -76,11 +78,6 @@ async function send(cmd){
 
   if(res.status === 401){
     alert("Incorrect passphrase")
-    return
-  }
-
-  if(res.status === 200){
-    console.log("Command sent:", cmd)
   }
 
 }
@@ -90,14 +87,18 @@ async function send(cmd){
 <style>
 
 .btn{
-    padding:18px;
+    height:64px;
     border-radius:12px;
     font-weight:600;
+    font-size:0.95rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     transition:all .15s ease;
 }
 
 .btn:active{
-    transform:scale(.96);
+    transform:scale(.95);
 }
 
 </style>
