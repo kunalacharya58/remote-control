@@ -27,6 +27,15 @@ body{
 
 <body class="bg-gray-900 text-gray-100 flex flex-col min-h-screen">
 
+<!-- Status widget -->
+<div id="status" class="absolute top-4 right-4 flex items-center gap-2 text-xs font-semibold text-gray-100">
+  <span id="status-dot" class="h-2 w-2 rounded-full bg-red-500"></span>
+  <span id="status-text" class="flex items-center gap-1">
+    <span id="battery-perc">--%</span>
+    <span id="battery-icon" class="text-yellow-300" aria-hidden="true"> </span>
+  </span>
+</div>
+
 <div class="flex-1 flex items-center justify-center">
 
 <div class="w-full max-w-sm px-4">
@@ -139,7 +148,41 @@ async function send(cmd){
   }
   alert("Command sent")
 
+  // Refresh status after issuing a command (it may change online/battery state)
+  updateStatus().catch(() => {})
 }
+
+async function updateStatus(){
+  const dot = document.getElementById("status-dot")
+  const perc = document.getElementById("battery-perc")
+  const icon = document.getElementById("battery-icon")
+
+  // Default to offline view
+  dot.className = "h-2 w-2 rounded-full bg-red-500"
+  perc.textContent = "--%"
+  icon.textContent = " "
+
+  try {
+    const res = await fetch("/.netlify/functions/getStatus")
+    if(!res.ok) throw new Error("non-200")
+
+    const data = await res.json()
+
+    const online = !!data.online
+    dot.className = online ? "h-2 w-2 rounded-full bg-green-500" : "h-2 w-2 rounded-full bg-red-500"
+
+    if(online){
+      perc.textContent = `${data.battery ?? "--"}%`
+      icon.textContent = data.charging ? "⚡" : " "
+    }
+  } catch (err) {
+    // Keep offline view
+  }
+}
+
+// Poll status every 10s
+updateStatus()
+setInterval(updateStatus, 10_000)
 
 </script>
 
