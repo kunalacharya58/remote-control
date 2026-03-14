@@ -152,35 +152,53 @@ async function send(cmd){
   updateStatus().catch(() => {})
 }
 
-async function updateStatus(){
+let statusState = {
+  online: false,
+  battery: "--",
+  charging: false
+}
+let statusFailureCount = 0
+
+function renderStatus(){
   const dot = document.getElementById("status-dot")
   const perc = document.getElementById("battery-perc")
   const icon = document.getElementById("battery-icon")
 
-  // Default to offline view
-  dot.className = "h-2 w-2 rounded-full bg-red-500"
-  perc.textContent = "--%"
-  icon.textContent = " "
+  dot.className = statusState.online
+    ? "h-2 w-2 rounded-full bg-green-500"
+    : "h-2 w-2 rounded-full bg-red-500"
 
+  perc.textContent = statusState.online ? `${statusState.battery ?? "--"}%` : "--%"
+  icon.textContent = statusState.online && statusState.charging ? "⚡" : " "
+}
+
+async function updateStatus(){
   try {
     const res = await fetch("/.netlify/functions/getStatus")
     if(!res.ok) throw new Error("non-200")
 
     const data = await res.json()
 
-    const online = !!data.online
-    dot.className = online ? "h-2 w-2 rounded-full bg-green-500" : "h-2 w-2 rounded-full bg-red-500"
+    statusFailureCount = 0
+    statusState.online = !!data.online
+    statusState.battery = data.battery ?? "--"
+    statusState.charging = !!data.charging
 
-    if(online){
-      perc.textContent = `${data.battery ?? "--"}%`
-      icon.textContent = data.charging ? "⚡" : " "
-    }
+    renderStatus()
   } catch (err) {
-    // Keep offline view
+    statusFailureCount += 1
+    // Only flip to offline after a few consecutive failures to avoid flicker
+    if(statusFailureCount >= 3){
+      statusState.online = false
+      statusState.battery = "--"
+      statusState.charging = false
+      renderStatus()
+    }
   }
 }
 
-// Poll status every 10s
+// Initial render + poll status every 10s
+renderStatus()
 updateStatus()
 setInterval(updateStatus, 10_000)
 
